@@ -1,0 +1,4 @@
+//端口映射
+ip nat inside source tcp/udp（服务） xxx.xxx.xxx.xxx(内网ip) xxx(端口) xxx.xxx.xxx.xxx(全局ip)  xxx(端口)
+ip nat in source  static tcp 192.168.1.10 80 1.1.1.1 80
+ip nat in source static udp 192.168.1.10 53 1.1.1.1 53

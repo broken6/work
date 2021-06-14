@@ -1,0 +1,68 @@
+
+ #  HSRP
+Interface vlan 10
+Standby 10 ip 192.168.1.254  //设置虚拟IP。
+// Standby version 2          //PT自动加了，此句可不输。
+Standby 10 timers 6 20     //配置HSRP组的HELLO时间和HOLD时间。
+Interface vlan 20
+Standby 20 ip 192.168.2.254
+// Standby version 2....不做此条配置
+
+S2
+Interface vlan 10
+Standby 10 ip 192.168.1.254 
+// Standby version 2
+Standby 10 timers 6 20 
+Interface vlan 20
+Standby 20 ip 192.168.2.254
+// Standby version 2....不做此条配置
+
+
+
+//显示standby信息
+     show standby brief
+
+
+//HSRP组优先级和HSRP抢占
+
+S1
+Interface vlan 10
+Standby 10 priority 105 //配置HSRP组的优先级，默认值为100，该值大的路由器会抢占为活动路由器。
+Standby 10 preempt    //配置HSRP的抢占，若不配置，即使优先级再高，也不会抢占为活动路由器，除非路由器重启。
+Int vlan 20
+Standby 20 preempt
+
+S2
+Interface vlan 10
+Standby 10 preempt    //配置HSRP的抢占，若不配置，即使优先级再高，也不会抢占为活动路由器，除非路由器重启。
+Int vlan 20
+Standby 20 priority 105  //配置HSRP组的优先级，默认值为100，该值大的路由器会抢占为活动路由器。
+Standby 20 preempt
+
+
+// HSRP验证(PT不能做)
+S1
+Interface vlan 10
+Standby 10 authentication md5 key-string cisco123
+Int vlan 20
+Standby 20 authen md5 key-string cisco123
+
+S2
+Interface vlan 10
+Standby 10 authentication md5 key-string cisco123
+Int vlan 20
+Standby 20 authen md5 key-string cisco123
+
+//配置HSRP接口跟踪
+
+若关闭S1的f0/1上行端口，通过show standby brief，发现S1还是VLAN 10的活动路由器。
+S1
+Interface vlan 10
+standby 10 track f0/1   //跟踪上行接口f0/1，发现关闭，则将优先级减10，使S2为VLAN10的活动路由器。
+
+S2
+Interface vlan 20
+Standby 20 track f0/1    //跟踪上行接口f0/1，发现关闭，则将优先级减10，使S1为VLAN20的活动路由器。
+
+验证：
+断开S1的f0/1端口，查看show standby brief。看活动路由器的变化。
